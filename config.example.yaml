@@ -1,0 +1,41 @@
+# Copy to config.yaml and fill in your data.
+brand:
+  name: "MyVPN"
+  # Where viewers should go (bot, site). Shown on the final slide.
+  cta_link: "@my_vpn_bot"
+  promo_code: "TIKTOK"
+  # Facts about your product: Claude writes scripts only from these,
+  # so it doesn't invent features you don't have.
+  features:
+    - "Работает на iPhone, Android, ПК"
+    - "Подключение в один клик через Telegram-бота"
+    - "Пробный период 3 дня бесплатно"
+    - "Серверы в Нидерландах, Германии, Финляндии"
+  audience: "молодёжь 16-30 лет из России, смотрят YouTube, Instagram, играют в игры"
+
+content:
+  language: "ru"
+  videos_per_day: 3
+  # Formats Claude chooses from each day.
+  formats:
+    - meme          # meme caption + punchline, no voice-over
+    - pov           # "POV: ..." situations
+    - story         # short story with voice-over, 3-5 slides
+    - top_list      # "3 причины..." lists
+  # Extra wishes for tone/style (optional).
+  style_notes: "Юмор, сленг без перебора, без мата. Не обещай того, чего нет в features."
+
+render:
+  width: 1080
+  height: 1920
+  fps: 30
+  seconds_per_slide: 2.8
+  voice: "ru-RU-DmitryNeural"   # or ru-RU-SvetlanaNeural
+  # Font with Cyrillic support. Put e.g. Montserrat-ExtraBold.ttf into assets/fonts.
+  font: "assets/fonts/Montserrat-ExtraBold.ttf"
+  fallback_font: "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
+
+publish:
+  telegram: true     # send finished videos to you in Telegram for review/manual upload
+  tiktok: false      # direct upload via TikTok Content Posting API (needs approved app)
+  tiktok_privacy: "SELF_ONLY"   # unaudited apps can only post SELF_ONLY

@@ -1,0 +1,47 @@
+name: Daily promo videos
+
+on:
+  schedule:
+    - cron: "47 13 * * *"   # 16:47 MSK: before the evening peak in the RU feed
+  workflow_dispatch:
+
+permissions:
+  contents: write   # to commit state/history.json (so ideas don't repeat)
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: sudo apt-get install -y fonts-dejavu-core
+      - run: pip install -r requirements.txt
+      - name: Write config from secret (or fall back to example)
+        env:
+          CONFIG_YAML: ${{ secrets.CONFIG_YAML }}
+        run: |
+          if [ -n "$CONFIG_YAML" ]; then printf '%s' "$CONFIG_YAML" > config.yaml; else cp config.example.yaml config.yaml; fi
+      - name: Generate, render, publish
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TIKTOK_ACCESS_TOKEN: ${{ secrets.TIKTOK_ACCESS_TOKEN }}
+          TIKTOK_REFRESH_TOKEN: ${{ secrets.TIKTOK_REFRESH_TOKEN }}
+          TIKTOK_CLIENT_KEY: ${{ secrets.TIKTOK_CLIENT_KEY }}
+          TIKTOK_CLIENT_SECRET: ${{ secrets.TIKTOK_CLIENT_SECRET }}
+        run: python -m vpnpromo
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: videos
+          path: output/**/*.mp4
+          retention-days: 7
+      - name: Save idea history
+        run: |
+          git config user.name "promo-bot"
+          git config user.email "promo-bot@users.noreply.github.com"
+          git add state/history.json
+          git diff --cached --quiet || (git commit -m "Update idea history" && git push)
